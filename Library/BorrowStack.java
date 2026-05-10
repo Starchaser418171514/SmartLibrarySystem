@@ -1,4 +1,4 @@
-package assignments.SmartLibrarySystem.Library;
+package SmartLibrarySystem.Library;
 
 import java.util.Stack;
 
