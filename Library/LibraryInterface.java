@@ -1,4 +1,4 @@
-//package SmartLibrarySystem.Library;
+package SmartLibrarySystem.Library;
 
 public interface LibraryInterface {
     public void addBook(int isbn, String title, String author);
