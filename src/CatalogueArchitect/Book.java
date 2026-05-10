@@ -1,11 +1,11 @@
-package SmartLibrarySystem.Catalogue_Architect
+package SmartLibrarySystem.CatalogueArchitect;
 
-public class BookData {
+public class Book {
     private long isbn; // Used as the key for the BST
     private String title;
     private String author;
 
-    public BookData(long isbn, String title, String author) {
+    public Book(long isbn, String title, String author) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
