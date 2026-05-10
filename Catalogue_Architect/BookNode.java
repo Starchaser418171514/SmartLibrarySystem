@@ -1,3 +1,5 @@
+package SmartLibrarySystem.Catalogue_Architect
+
 class BookNode {
     BookData book;
     BookNode left, right;

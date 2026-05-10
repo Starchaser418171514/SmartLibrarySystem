@@ -1,3 +1,5 @@
+package SmartLibrarySystem.Catalogue_Architect
+
 public class BookData {
     private long isbn; // Used as the key for the BST
     private String title;
