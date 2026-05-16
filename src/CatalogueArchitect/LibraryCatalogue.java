@@ -1,4 +1,4 @@
-package SmartLibrarySystem.CatalogueArchitect;
+package SmartLibrarySystem.src.CatalogueArchitect;
 
 public class LibraryCatalogue {
     private BookNode root;
