@@ -1,7 +1,7 @@
 package SmartLibrarySystem.src.Library;
 
 import java.util.Stack;
-import SmartLibrarySystem.src.CatalogueArchitect;
+import SmartLibrarySystem.src.CatalogueArchitect.*;
 public class BorrowStack {
 
     private Stack <Book> history;
