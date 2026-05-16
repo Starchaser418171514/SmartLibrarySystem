@@ -1,4 +1,4 @@
-package SmartLibrarySystem.Library;
+package SmartLibrarySystem.src.Library;
 
 import java.util.Stack;
 import SmartLibrarySystem.CatalogueArchitect;
