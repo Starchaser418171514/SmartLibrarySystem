@@ -1,4 +1,4 @@
-package SmartLibrarySystem.CatalogueArchitect;
+package SmartLibrarySystem.src.CatalogueArchitect;
 
 class BookNode {
     BookData book;
