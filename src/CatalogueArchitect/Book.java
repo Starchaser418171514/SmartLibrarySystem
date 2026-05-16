@@ -1,4 +1,4 @@
-package SmartLibrarySystem.CatalogueArchitect;
+package SmartLibrarySystem.src.CatalogueArchitect;
 
 public class Book {
     private long isbn; // Used as the key for the BST
