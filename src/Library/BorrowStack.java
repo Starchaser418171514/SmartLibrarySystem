@@ -30,7 +30,7 @@ public class BorrowStack {
         
         for (int i = history.size() - 1; i >= 0; i--) {
             Book b = history.get(i);
-            System.out.printf("%-10d | %-20s | %-20s\n", b.isbn, b.title, b.author);
+            System.out.printf("%-10d | %-20s | %-20s\n", b.getIsbn(), b.getTitle(), b.getAuthor());
             System.out.println("---------------------------------------------------");
         }
     }
