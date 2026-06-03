@@ -1,10 +1,10 @@
 package SmartLibrarySystem.src.CatalogueArchitect;
 
 class BookNode {
-    BookData book;
+    Book book;
     BookNode left, right;
 
-    public BookNode(BookData book) {
+    public BookNode(Book book) {
         this.book = book;
         this.left = this.right = null;
     }

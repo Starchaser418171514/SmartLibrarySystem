@@ -36,7 +36,7 @@ public class SmartLibrary implements LibraryInterface {
      * Function to view the latest borrowing history
      */
     public void viewLatestHistory() {
-        borrowHistory.showHistory();
+        borrowStack.showHistory();
     }
 
     /**

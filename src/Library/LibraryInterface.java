@@ -1,8 +1,8 @@
 package SmartLibrarySystem.src.Library;
 
 public interface LibraryInterface {
-    public void addBook(int isbn, String title, String author);
-    public void borrowBook(int isbn);
+    public void addBook(long isbn, String title, String author);
+    public void borrowBook(long isbn);
     public void viewLatestHistory();
-    public void findBook(int isbn);
+    public void findBook(long isbn);
 }
