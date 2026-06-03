@@ -1,7 +1,7 @@
-package SmartLibrarySystem.src.CatalogueArchitect;
+package CatalogueArchitect;
 
 class BookNode {
-    Book book;
+    Book book; // Fixed from BookData to Book
     BookNode left, right;
 
     public BookNode(Book book) {
