@@ -41,8 +41,13 @@ public class SmartLibrary implements LibraryInterface {
             // Mark as borrowed and save to the history stack file
             book.setIsBorrowed(true);
             borrowHistory.addBorrowedBook(studentId, book);
+            
+            // NEW: Update the catalogue file so it remembers this book is now borrowed
+            catalogue.updateCatalogueFileState();
             return true;
         }
+
+        System.out.println("Error: Book with ISBN " + isbn + " does not belong to this library.");
         return false;
     }
 
@@ -59,9 +64,13 @@ public class SmartLibrary implements LibraryInterface {
             
             // Revert availability states
             book.setIsBorrowed(false);
-            
+        
             // Update the text file history state
             borrowHistory.returnBookInFile(studentId, isbn);
+
+            // NEW: Update the catalogue file so it remembers this book is available again
+            catalogue.updateCatalogueFileState();
+
             System.out.println("Success: \"" + book.getTitle() + "\" has been returned and is available again!");
             return true;
         }
