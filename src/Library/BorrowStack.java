@@ -20,6 +20,26 @@ public class BorrowStack {
         }
     }
 
+    // NEW HELPER: Searches a student's history file to retrieve book metadata for return reconstruction
+    public Book findBookInHistory(String studentId, long isbn) {
+        String personalFileName = studentId + "_history.txt";
+        File file = new File(personalFileName);
+        if (!file.exists()) return null;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(",");
+                if (tokens.length == 4 && Long.parseLong(tokens[0]) == isbn && tokens[3].equals("Borrowed")) {
+                    return new Book(isbn, tokens[1], tokens[2]); // Rebuild book instance
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Error reading history file for data verification.");
+        }
+        return null;
+    }
+
     // NEW FEATURE: Updates the status of a specific book inside the student's file to "Returned"
     public void returnBookInFile(String studentId, long isbn) {
         String personalFileName = studentId + "_history.txt";
