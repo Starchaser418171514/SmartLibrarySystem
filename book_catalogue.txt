@@ -1,6 +1,4 @@
-1,The Lightkeeper's Daughter,Jean Pendziwol,false
-3,The Street Lawyer,John Grisham,false
+1,The Lightkeeper's,Jean Pendziwol,false
 4,Normal People,Sally Rooney,false
 5,Throne of Glass,Sarah J. Mass,false
-6,Harry Potter & the Philosopher's Stone,JK Rowling,false
 7,Digital Minimalism,Cal Newport,false
