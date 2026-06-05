@@ -17,8 +17,8 @@ public class Main {
             System.out.println("2. Search Book by ISBN");
             System.out.println("3. Borrow Book");
             System.out.println("4. Return Book");
-            System.out.println("5. View Personal History by Student ID");
-            System.out.println("6. View Complete Library Directory");
+            System.out.println("5. View History by Student ID");
+            System.out.println("6. View Library Catalogue");
             System.out.println("7. Exit System");
             System.out.print("Select operational choice: ");
 
@@ -30,6 +30,7 @@ public class Main {
 
             int choice = sc.nextInt();
             sc.nextLine(); 
+            System.out.println(); 
 
             if (choice == 7) {
                 System.out.println("Exiting System Database. Goodbye.");
@@ -38,6 +39,16 @@ public class Main {
 
             switch (choice) {
                 case 1:
+                    // Simple role verification gate
+                    System.out.print("Access Denied: Librarian credentials required.\nEnter Admin Password to proceed: ");
+                    String password = sc.nextLine().trim();
+                    
+                    if (!password.equals("admin123")) { // You can set any password here
+                        System.out.println("Authorization Failure: Incorrect password. Returning to main menu.");
+                        break;
+                    }
+                    System.out.println("Access Granted. Proceeding with catalogue insertion...");
+
                     System.out.print("Enter Book ISBN (Numeric): ");
                     if (!sc.hasNextLong()) {
                         System.out.println("Validation Failure: ISBN must be a number sequence.");
@@ -121,7 +132,7 @@ public class Main {
                     break;
 
                 case 6:
-                    System.out.println("\n--- Complete Catalog Directory ---");
+                    System.out.println("\n--------------------- Complete Library Catalogue ---------------------");
                     library.displayAllCatalogBooks();
                     break;
 
