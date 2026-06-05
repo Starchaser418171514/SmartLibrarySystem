@@ -26,7 +26,6 @@ public class Book {
     @Override
     public String toString() {
         // Updated to show book status in the catalogue display
-        String status = isBorrowed ? "[Borrowed]" : "[Available]";
-        return String.format("[ISBN: %d] %s by %s %s", isbn, title, author, status);
+        return String.format("[ISBN: %d] \"%s\" by %s", isbn, title, author);
     }
 }
