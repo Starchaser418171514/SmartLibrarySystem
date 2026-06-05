@@ -43,10 +43,8 @@ public class LibraryCatalogue {
         }
     }
 
-    /**
-     * Helper for loading: Inserts books into the BST silently without rewriting them back to the file
-     */
-    private void insertFromFile(Book book) {
+    // Direct insertion method used for loading from file or re-inserting returns
+    public void insertBookObject(Book book) {
         root = insertRecursive(root, book);
     }
 
@@ -63,6 +61,42 @@ public class LibraryCatalogue {
             System.out.println("Error: Book with ISBN " + book.getIsbn() + " already exists.");
         }
         return current;
+    }
+
+    /**
+     * PHYSICAL DELETION LOGIC: Removes a node entirely from the Binary Search Tree
+     */
+    public void removeBook(long isbn) {
+        root = deleteRecursive(root, isbn);
+        updateCatalogueFileState(); // Refresh the file database to remove the book text row
+    }
+
+    private BookNode deleteRecursive(BookNode current, long isbn) {
+        if (current == null) return null;
+
+        if (isbn < current.book.getIsbn()) {
+            current.left = deleteRecursive(current.left, isbn);
+        } else if (isbn > current.book.getIsbn()) {
+            current.right = deleteRecursive(current.right, isbn);
+        } else {
+            // Node found: handle deletion cases
+            if (current.left == null) return current.right;
+            if (current.right == null) return current.left;
+
+            // Node with two children: Get the inorder successor (smallest in the right subtree)
+            current.book = findSmallest(current.right);
+            current.right = deleteRecursive(current.right, current.book.getIsbn());
+        }
+        return current;
+    }
+
+    private Book findSmallest(BookNode root) {
+        Book smallest = root.book;
+        while (root.left != null) {
+            smallest = root.left.book;
+            root = root.left;
+        }
+        return smallest;
     }
 
     public Book findBook(long isbn) {
@@ -105,9 +139,7 @@ public class LibraryCatalogue {
         }
     }
 
-    /**
-     * EXTRA FEATURE: Reads the catalogue file line by line to completely rebuild the BST on startup
-     */
+    // EXTRA FEATURE: Reads the catalogue file line by line to completely rebuild the BST on startup
     private void loadCatalogueFromFile() {
         File file = new File(CATALOGUE_FILE);
         if (!file.exists()) return;
@@ -118,19 +150,17 @@ public class LibraryCatalogue {
                 String[] tokens = line.split(",");
                 if (tokens.length == 4) {
                     long isbn = Long.parseLong(tokens[0]);
-                    String title = tokens[1];
-                    String author = tokens[2];
                     boolean isBorrowed = Boolean.parseBoolean(tokens[3]);
 
-                    Book book = new Book(isbn, title, author);
-                    book.setIsBorrowed(isBorrowed);
-                    
-                    // Direct insertion to bypass the saveBookToFile loop
-                    insertFromFile(book);
+                    // Only load it into the active BST if it wasn't physically left in a borrowed state
+                    if (!isBorrowed) {
+                        Book book = new Book(isbn, tokens[1], tokens[2]);
+                        insertBookObject(book);
+                    }
                 }
             }
         } catch (IOException | NumberFormatException e) {
-            System.out.println("Notice: Resetting catalogue stream due to read errors.");
+            System.out.println("Notice: Error parsing catalogue file.");
         }
     }
 

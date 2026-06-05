@@ -32,50 +32,42 @@ public class SmartLibrary implements LibraryInterface {
         Book book = findBook(isbn);
         
         if (book != null) {
-            // Check if the book is borrowed 
-            if (book.getIsBorrowed()) {
-                System.out.println("Denial: Blocked processing. \"" + book.getTitle() + "\" is currently borrowed.");
-                return false;
-            }
-            
-            // Mark as borrowed and save to the history stack file
+            // 1. Mark status and append to user text file stack
             book.setIsBorrowed(true);
             borrowHistory.addBorrowedBook(studentId, book);
             
-            // NEW: Update the catalogue file so it remembers this book is now borrowed
-            catalogue.updateCatalogueFileState();
+            // 2. Physically remove the book node from the tree
+            catalogue.removeBook(isbn);
+            System.out.println("Success: Book has been physically checked out and removed from the active catalogue.");
             return true;
         }
 
-        System.out.println("Error: Book with ISBN " + isbn + " does not belong to this library.");
+        System.out.println("Error: Book with ISBN " + isbn + " is not available in the catalogue. ");
         return false;
     }
 
-    // NEW FEATURE: Handles returning a book back into the system
-    public boolean returnBook(String studentId, long isbn) {
-        Book book = findBook(isbn);
+    // Upgraded Admin Logic: Recovers book data from borrower's history file and re-inserts it back into the BST catalogue
+    public boolean returnBook(String studentId, long isbn) {        
+        // Find the book data inside the student's file history since it doesn't exist in the tree anymore
+        Book bookContext = borrowHistory.findBookInHistory(studentId, isbn);
         
-        if (book != null) {
-            // Validation: Make sure the book is borrowed before allowing return
-            if (!book.getIsBorrowed()) {
-                System.out.println("Error: \"" + book.getTitle() + "\" is already available in the library.");
-                return false;
-            }
-            
-            // Revert availability states
-            book.setIsBorrowed(false);
+        if (bookContext != null) {
+            // Revert availability flag state
+            bookContext.setIsBorrowed(false);
         
-            // Update the text file history state
+            // 1. Physically insert the book node back into the Binary Search Tree
+            catalogue.insertBookObject(bookContext);
+            catalogue.updateCatalogueFileState(); // Sync up main text database file
+
+            // 2. Mark the row status as "Returned" inside the student's personal history file
             borrowHistory.returnBookInFile(studentId, isbn);
 
-            // NEW: Update the catalogue file so it remembers this book is available again
-            catalogue.updateCatalogueFileState();
-
-            System.out.println("Success: \"" + book.getTitle() + "\" has been returned and is available again!");
+            System.out.println("Success: \"" + bookContext.getTitle() + "\" has been returned and re-inserted into the active catalogue!");
             return true;
+        } else {
+            System.out.println("Error: No active matching borrow record found for ISBN " + isbn + " under Student ID: " + studentId);
+            return false;
         }
-        System.out.println("Error: Book with ISBN " + isbn + " does not belong to this library.");
-        return false;
     }
 
     /**
