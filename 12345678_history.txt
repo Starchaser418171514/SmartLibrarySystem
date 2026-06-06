@@ -1,3 +1,4 @@
 3,The Street Lawyer,John Grisham,Returned
 6,Harry Potter & the Philosopher's Stone,JK Rowling,Returned
 2,Murder at the Book Club,Betsy Reacley,Returned
+2,Beauty and the Beast,Gabrielle-Suzanne Barbot de Villeneuve,Returned

@@ -10,11 +10,37 @@ import java.io.PrintWriter;
 public class LibraryCatalogue {
     private BookNode root;
     private static final String CATALOGUE_FILE = "book_catalogue.txt";  // sava available book
-    
+    private static final String ALL_BOOKS_FILE = "allBooks.txt"; //save all book data
 
     public LibraryCatalogue() {
         // Automatically load existing books from the file when the catalogue is initialized
         loadCatalogueFromFile();
+    }
+
+    private boolean isbnExistsInAllBooks(long isbn) {
+        File file = new File(ALL_BOOKS_FILE);
+        if (!file.exists()) return false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(",");
+                if (tokens.length >= 1 && Long.parseLong(tokens[0].trim()) == isbn) {
+                    return true;
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Warning: Could not read allBooks file.");
+        }
+        return false;
+    }
+
+    private void saveToAllBooksFile(Book book) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(ALL_BOOKS_FILE, true))) {
+            writer.println(book.getIsbn() + "," + book.getTitle() + "," + book.getAuthor());
+        } catch (IOException e) {
+            System.out.println("Warning: Unable to write to allBooks file.");
+        }
     }
 
     public void addBook(long isbn, String title, String author) {
@@ -33,11 +59,13 @@ public class LibraryCatalogue {
             return;
         }
 
-        // Only write to the text file if the book doesn't already exist in our tree
-        if (findBook(isbn) == null) {
+        // Only write to the text file if the book doesn't already exist
+
+        if (!isbnExistsInAllBooks(isbn)) {
             Book newBook = new Book(isbn, title, author);
             root = insertRecursive(root, newBook);
-            saveBookToFile(newBook); // Save to file database instantly
+            saveBookToFile(newBook);       // saves to book_catalogue.txt
+            saveToAllBooksFile(newBook);   // saves to allBooks.txt (permanent record)
             System.out.println("Success: \"" + title + "\" added to catalog file.");
         } else {
             System.out.println("Error: Book with ISBN " + isbn + " already exists in system records.");

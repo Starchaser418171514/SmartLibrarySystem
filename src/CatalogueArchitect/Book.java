@@ -28,4 +28,5 @@ public class Book {
         // Updated to show book status in the catalogue display
         return String.format("[ISBN: %d] \"%s\" by %s", isbn, title, author);
     }
+    
 }
