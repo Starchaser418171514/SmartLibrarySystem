@@ -1,2 +1,3 @@
-3,The Street Lawyer,John Grisham,Borrowed
-6,Harry Potter & the Philosopher's Stone,JK Rowling,Borrowed
+3,The Street Lawyer,John Grisham,Returned
+6,Harry Potter & the Philosopher's Stone,JK Rowling,Returned
+2,Murder at the Book Club,Betsy Reacley,Returned
