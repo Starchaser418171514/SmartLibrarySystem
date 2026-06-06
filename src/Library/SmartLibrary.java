@@ -57,7 +57,7 @@ public class SmartLibrary implements LibraryInterface {
         
             // 1. Physically insert the book node back into the Binary Search Tree
             catalogue.insertBookObject(bookContext);
-            catalogue.updateCatalogueFileState(); // Sync up main text database file
+            catalogue.updateActiveCatalogueFileState(); // Sync up main text database file
 
             // 2. Mark the row status as "Returned" inside the student's personal history file
             borrowHistory.returnBookInFile(studentId, isbn);
@@ -90,6 +90,32 @@ public class SmartLibrary implements LibraryInterface {
     // Expose catalog printing to system view loops
     public void displayAllCatalogBooks() {
         catalogue.displayAllBooks();
+    }
+
+    /**
+     * NEW SEARCH HELPER: Scans the permanent global file to determine 
+     * if a missing BST book is borrowed or completely non-existent.
+     * Returns "Borrowed" if owned but out on loan, or "Not Owned" if missing completely.
+     */
+    public String checkPermanentRegistry(long isbn) {
+        java.io.File file = new java.io.File("allBooks.txt");
+        if (!file.exists()) return "Not Owned";
+
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(",");
+                if (tokens.length == 4 && Long.parseLong(tokens[0].trim()) == isbn) {
+                    boolean isBorrowed = Boolean.parseBoolean(tokens[3].trim());
+                    if (isBorrowed) {
+                        return "Borrowed"; // Found in global records, and it's out on loan
+                    }
+                }
+            }
+        } catch (java.io.IOException | NumberFormatException e) {
+            System.out.println("Warning: Error accessing global history registry.");
+        }
+        return "Not Owned";
     }
 }
 

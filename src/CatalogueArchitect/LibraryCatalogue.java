@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LibraryCatalogue {
     private BookNode root;
@@ -17,7 +19,12 @@ public class LibraryCatalogue {
         loadCatalogueFromFile();
     }
 
-    private boolean isbnExistsInAllBooks(long isbn) {
+    /**
+     * STRICT UNIQUE VALIDATION: Checks the permanent global registry file.
+     * Returns true if the ISBN exists ANYWHERE in the library archive, 
+     * completely blocking duplicates even if the book is currently borrowed.
+     */
+    private boolean isBookCurrentlyAvailableInLibrary(long isbn) {
         File file = new File(ALL_BOOKS_FILE);
         if (!file.exists()) return false;
 
@@ -25,22 +32,15 @@ public class LibraryCatalogue {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");
+                // STRIP THE BOOLEAN CHECK: If the ISBN matches, it exists in the library!
                 if (tokens.length >= 1 && Long.parseLong(tokens[0].trim()) == isbn) {
-                    return true;
+                    return true; // Stop immediately; this ISBN is already registered
                 }
             }
         } catch (IOException | NumberFormatException e) {
-            System.out.println("Warning: Could not read allBooks file.");
+            System.out.println("Warning: Could not read permanent global tracking database.");
         }
         return false;
-    }
-
-    private void saveToAllBooksFile(Book book) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(ALL_BOOKS_FILE, true))) {
-            writer.println(book.getIsbn() + "," + book.getTitle() + "," + book.getAuthor());
-        } catch (IOException e) {
-            System.out.println("Warning: Unable to write to allBooks file.");
-        }
     }
 
     public void addBook(long isbn, String title, String author) {
@@ -59,16 +59,17 @@ public class LibraryCatalogue {
             return;
         }
 
-        // Only write to the text file if the book doesn't already exist
-
-        if (!isbnExistsInAllBooks(isbn)) {
+        // Validate against the permanent tracking file status
+        if (!isBookCurrentlyAvailableInLibrary(isbn)) {
             Book newBook = new Book(isbn, title, author);
             root = insertRecursive(root, newBook);
-            saveBookToFile(newBook);       // saves to book_catalogue.txt
-            saveToAllBooksFile(newBook);   // saves to allBooks.txt (permanent record)
-            System.out.println("Success: \"" + title + "\" added to catalog file.");
+            
+            // UNIFIED METHOD CALL: Writes to both storage files simultaneously upon addition
+            saveBookToFiles(newBook, false); 
+            
+            System.out.println("Success: \"" + title + "\" added to both active and permanent catalogs.");
         } else {
-            System.out.println("Error: Book with ISBN " + isbn + " already exists in system records.");
+            System.out.println("Error: An available copy with ISBN " + isbn + " already exists in the library shelf records.");
         }
     }
 
@@ -94,10 +95,12 @@ public class LibraryCatalogue {
 
     /**
      * PHYSICAL DELETION LOGIC: Removes a node entirely from the Binary Search Tree
+     * and synchronizes the change to both storage tracking files.
      */
     public void removeBook(long isbn) {
         root = deleteRecursive(root, isbn);
-        updateCatalogueFileState(); // Refresh the file database to remove the book text row
+        updateActiveCatalogueFileState();             // Overwrites active file to remove the borrowed book from active catalogue
+        updatePermanentRegistryFileState(isbn, true); // Updates state line to true (Borrowed) in global file
     }
 
     private BookNode deleteRecursive(BookNode current, long isbn) {
@@ -158,17 +161,27 @@ public class LibraryCatalogue {
     }
 
     /**
-     * EXTRA FEATURE: Instantly appends a newly created book to the catalogue file
+     * UNIFIED FILE SAVING METHOD: Handles writing to both tracking files simultaneously
      */
-    private void saveBookToFile(Book book) {
+    private void saveBookToFiles(Book book, boolean isBorrowed) {
+        // 1. Write the clean 3-column format to the active catalogue file
         try (PrintWriter writer = new PrintWriter(new FileWriter(CATALOGUE_FILE, true))) {
-            writer.println(book.getIsbn() + "," + book.getTitle() + "," + book.getAuthor() + "," + book.getIsBorrowed());
+            writer.println(book.getIsbn() + "," + book.getTitle() + "," + book.getAuthor());
         } catch (IOException e) {
-            System.out.println("Warning: Unable to save book to catalogue file.");
+            System.out.println("Warning: Unable to save to active catalogue file.");
+        }
+
+        // 2. Write the 4-column status-tracked format to the permanent catalogue file
+        try (PrintWriter writer = new PrintWriter(new FileWriter(ALL_BOOKS_FILE, true))) {
+            writer.println(book.getIsbn() + "," + book.getTitle() + "," + book.getAuthor() + "," + isBorrowed);
+        } catch (IOException e) {
+            System.out.println("Warning: Unable to save to permanent catalogue file.");
         }
     }
 
-    // EXTRA FEATURE: Reads the catalogue file line by line to completely rebuild the BST on startup
+    /**
+     * SYSTEM INITIALIZATION LOADER: Rebuilds the active available BST on boot using the clean 3-column records (active catalogue file)
+     */
     private void loadCatalogueFromFile() {
         File file = new File(CATALOGUE_FILE);
         if (!file.exists()) return;
@@ -177,39 +190,70 @@ public class LibraryCatalogue {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");
-                if (tokens.length == 4) {
+                if (tokens.length == 3) {
                     long isbn = Long.parseLong(tokens[0]);
-                    boolean isBorrowed = Boolean.parseBoolean(tokens[3]);
-
-                    // Only load it into the active BST if it wasn't physically left in a borrowed state
-                    if (!isBorrowed) {
-                        Book book = new Book(isbn, tokens[1], tokens[2]);
-                        insertBookObject(book);
-                    }
+                    Book book = new Book(isbn, tokens[1], tokens[2]);
+                    insertBookObject(book);
                 }
             }
         } catch (IOException | NumberFormatException e) {
-            System.out.println("Notice: Error parsing catalogue file.");
+            System.out.println("Notice: Error parsing active catalogue file registry.");
         }
     }
 
     /**
-     * EXTRA FEATURE: Rewrites the file to save updated states (like when a book is borrowed or returned)
+     * ACTIVE TRACK DATABASE SYNCHRONIZER: Wipes and completely overwrites active catalogue file entries 
+     * using the current remaining in-memory live tree structure state
      */
-    public void updateCatalogueFileState() {
+    public void updateActiveCatalogueFileState() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(CATALOGUE_FILE))) {
-            // Traverse the tree and rewrite all books with their updated statuses
-            writeTreeToFile(root, writer);
+            writeTreeToActiveFile(root, writer);
         } catch (IOException e) {
-            System.out.println("Error saving updated book states to catalogue file.");
+            System.out.println("Error saving updated states to active catalogue file.");
         }
     }
 
-    private void writeTreeToFile(BookNode node, PrintWriter writer) {
+    private void writeTreeToActiveFile(BookNode node, PrintWriter writer) {
         if (node != null) {
-            writeTreeToFile(node.left, writer);
-            writer.println(node.book.getIsbn() + "," + node.book.getTitle() + "," + node.book.getAuthor() + "," + node.book.getIsBorrowed());
-            writeTreeToFile(node.right, writer);
+            writeTreeToActiveFile(node.left, writer);
+            writer.println(node.book.getIsbn() + "," + node.book.getTitle() + "," + node.book.getAuthor());
+            writeTreeToActiveFile(node.right, writer);
+        }
+    }
+
+    /**
+     * PERMANENT TRACK DATABASE SYNCHRONIZER: Sifts through and flips state values only for lines 
+     * matching our current ISBN targets inside your permanent text registry database
+     */
+    public void updatePermanentRegistryFileState(long targetIsbn, boolean statusToSet) {
+        File file = new File(ALL_BOOKS_FILE);
+        if (!file.exists()) return;
+
+        List<String> memoryBuffer = new ArrayList<>();
+        boolean updated = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(",");
+                if (tokens.length == 4 && Long.parseLong(tokens[0].trim()) == targetIsbn && !updated) {
+                    memoryBuffer.add(tokens[0] + "," + tokens[1] + "," + tokens[2] + "," + statusToSet);
+                    updated = true; // Protect duplicate copy profiles by shifting only the targeted instance entry
+                } else {
+                    memoryBuffer.add(line);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error updating transactional rows inside permanent registry tracking file.");
+            return;
+        }
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+            for (String line : memoryBuffer) {
+                writer.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving updated modifications back to permanent registry tracking file.");
         }
     }
 }

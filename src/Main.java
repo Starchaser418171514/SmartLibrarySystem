@@ -77,11 +77,20 @@ public class Main {
                     long targetIsbn = sc.nextLong();
                     sc.nextLine();
 
+                    // Step 1: High-speed O(log n) search through the active catalogue BST
                     Book matchingBook = library.findBook(targetIsbn);
+                    
                     if (matchingBook != null) {
-                        System.out.println("Query Match Found -> " + matchingBook);
+                        System.out.println("Query Match Found -> " + matchingBook + " [Status: Available on Shelf]");
                     } else {
-                        System.out.println("Query Result: No book found with ISBN " + targetIsbn + " in active catalogue (It may be borrowed or invalid).");
+                        // Step 2: Fallback deep-scan validation in permanent registry if missing from the active catalogue
+                        String registryStatus = library.checkPermanentRegistry(targetIsbn);
+                        
+                        if (registryStatus.equals("Borrowed")) {
+                            System.out.println("Query Result: Book with ISBN " + targetIsbn + " belongs to this library, but it is currently [Borrowed]!");
+                        } else {
+                            System.out.println("Query Result: No book found with ISBN " + targetIsbn + " in our library system database.");
+                        }
                     }
                     break;
 

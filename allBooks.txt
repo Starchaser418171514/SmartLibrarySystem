@@ -1,7 +1,7 @@
 1,The Lightkeeper's,Jean Pendziwol,false
 2,Beauty and the Beast,Gabrielle-Suzanne Barbot de Villeneuve,false
 3,The Street Lawyer,John Grisham,false
-4,Normal People,Sally Rooney,false
+4,Normal People,Sally Rooney,true
 5,Throne of Glass,Sarah J. Mass,false
 6,Harry Potter & the Philosopher's Stone,JK Rowling,false
 7,Digital Minimalism,Cal Newport,false
