@@ -9,7 +9,8 @@ import java.io.PrintWriter;
 
 public class LibraryCatalogue {
     private BookNode root;
-    private static final String CATALOGUE_FILE = "book_catalogue.txt";
+    private static final String CATALOGUE_FILE = "book_catalogue.txt";  // sava available book
+    
 
     public LibraryCatalogue() {
         // Automatically load existing books from the file when the catalogue is initialized

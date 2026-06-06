@@ -18,7 +18,7 @@ public class Main {
             System.out.println("3. Borrow Book");
             System.out.println("4. Return Book");
             System.out.println("5. View History by Student ID");
-            System.out.println("6. View Library Catalogue");
+            System.out.println("6. View Available Library Catalogue");
             System.out.println("7. Exit System");
             System.out.print("Select operational choice: ");
 
@@ -81,7 +81,7 @@ public class Main {
                     if (matchingBook != null) {
                         System.out.println("Query Match Found -> " + matchingBook);
                     } else {
-                        System.out.println("Query Result: No book found with ISBN " + targetIsbn);
+                        System.out.println("Query Result: No book found with ISBN " + targetIsbn + " in active catalogue (It may be borrowed or invalid).");
                     }
                     break;
 
