@@ -1,31 +1,29 @@
 package CatalogueArchitect;
 
 public class Book {
-    private long isbn;  // Used as the key for the BST
+    private long isbn; 
     private String title;
     private String author;
-
-    // NEW FEATURES: Availability Status Flags
     private boolean isBorrowed;
+
 
     public Book(long isbn, String title, String author) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
-        this.isBorrowed = false;  // Default to available when a book is created
+        this.isBorrowed = false;  
     }
+    // Getters and setters
+    public long getIsbn(){return isbn;}
+    public String getTitle(){return title;}
+    public String getAuthor(){return author;}
+    public boolean getIsBorrowed(){return isBorrowed;}
+    public void setIsBorrowed(boolean borrowed){this.isBorrowed = borrowed;}
 
-    public long getIsbn() { return isbn; }
-    public String getTitle() { return title; }
-    public String getAuthor() { return author; }
-
-    // Getters and setters for the new status fields
-    public boolean getIsBorrowed() { return isBorrowed; }
-    public void setIsBorrowed(boolean borrowed) { this.isBorrowed = borrowed; }
-    
     @Override
     public String toString() {
-        // Updated to show book status in the catalogue display
+        // display book information: isbn,title,author
         return String.format("[ISBN: %d] \"%s\" by %s", isbn, title, author);
     }
+    
 }

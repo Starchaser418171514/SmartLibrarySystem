@@ -1,9 +1,10 @@
-1,The Lightkeeper's,Jean Pendziwol,false
-2,hi,hi,false
-3,The Street Lawyer,John Grisham,false
-4,Normal People,Sally Rooney,false
-5,Throne of Glass,Sarah J. Mass,false
-6,Harry Potter & the Philosopher's Stone,JK Rowling,false
-7,Digital Minimalism,Cal Newport,false
-8,Little Red Riding Hood,Charles Perrault's,false
-9,Snow White,Jacob and Wilhelm Grimm,false
+1,The Lightkeeper's,Jean Pendziwol
+2,Beauty and the Beast,Gabrielle-Suzanne Barbot
+3,The Street Lawyer,John Grisham
+4,Normal People,Sally Rooney
+5,Throne of Glass,Sarah J. Mass
+6,Harry Potter & the Philosopher's Stone,JK Rowling
+7,Digital Minimalism,Cal Newport
+8,Little Red Riding Hood,Charles Perrault's
+9,Snow White,Jacob and Wilhelm Grimm
+10,Cinderella,Charles Perrault

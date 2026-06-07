@@ -1,7 +1,7 @@
 package CatalogueArchitect;
 
 class BookNode {
-    Book book; // Fixed from BookData to Book
+    Book book; 
     BookNode left, right;
 
     public BookNode(Book book) {

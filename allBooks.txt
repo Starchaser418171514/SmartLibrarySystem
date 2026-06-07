@@ -1,0 +1,10 @@
+1,The Lightkeeper's,Jean Pendziwol,false
+2,Beauty and the Beast,Gabrielle-Suzanne Barbot,false
+3,The Street Lawyer,John Grisham,true
+4,Normal People,Sally Rooney,true
+5,Throne of Glass,Sarah J. Mass,true
+6,Harry Potter & the Philosopher's Stone,JK Rowling,true
+7,Digital Minimalism,Cal Newport,true
+8,Little Red Riding Hood,Charles Perrault's,false
+9,Snow White,Jacob and Wilhelm Grimm,false
+10,Cinderella,Charles Perrault,false
