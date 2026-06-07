@@ -106,16 +106,16 @@ public class BorrowStack {
             return;
         }
 
-        System.out.println("\n--------------------- Borrowing History for " + studentId + " (Most Recent First) ---------------------\n");
-        System.out.printf("%-15s | %-40s | %-20s | %-10s\n", "ISBN", "Title", "Author", "Status");
-        System.out.println("---------------------------------------------------------------------------------------------");
+        System.out.println("\n------------------------ Borrowing History for " + studentId + " (Most Recent First) -----------------------\n");
+        System.out.printf("%-15s | %-40s | %-25s | %-10s\n", "ISBN", "Title", "Author", "Status");
+        System.out.println("--------------------------------------------------------------------------------------------------");
         
         // Pop out values to show the most recent actions first (LIFO pattern)
         while (!displayStack.isEmpty()) {
             String[] tokens = displayStack.pop().split(",");
             if (tokens.length == 4) {
-                System.out.printf("%-15s | %-40s | %-20s | %-10s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
-                System.out.println("---------------------------------------------------------------------------------------------");
+                System.out.printf("%-15s | %-40s | %-25s | %-10s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
+                System.out.println("--------------------------------------------------------------------------------------------------");
             }
         }
     }

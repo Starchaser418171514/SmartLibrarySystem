@@ -1,5 +1,5 @@
 1,The Lightkeeper's,Jean Pendziwol,false
-2,Beauty and the Beast,Gabrielle-Suzanne Barbot de Villeneuve,false
+2,Beauty and the Beast,Gabrielle-Suzanne Barbot,false
 3,The Street Lawyer,John Grisham,false
 4,Normal People,Sally Rooney,true
 5,Throne of Glass,Sarah J. Mass,false

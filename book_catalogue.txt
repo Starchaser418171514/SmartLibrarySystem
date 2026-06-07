@@ -1,5 +1,5 @@
 1,The Lightkeeper's,Jean Pendziwol
-2,Beauty and the Beast,Gabrielle-Suzanne Barbot de Villeneuve
+2,Beauty and the Beast,Gabrielle-Suzanne Barbot
 3,The Street Lawyer,John Grisham
 5,Throne of Glass,Sarah J. Mass
 6,Harry Potter & the Philosopher's Stone,JK Rowling
