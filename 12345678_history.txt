@@ -2,3 +2,6 @@
 6,Harry Potter & the Philosopher's Stone,JK Rowling,Returned
 2,Murder at the Book Club,Betsy Reacley,Returned
 2,Beauty and the Beast,Gabrielle-Suzanne Barbot,Returned
+5,Throne of Glass,Sarah J. Mass,Returned
+6,Harry Potter & the Philosopher's Stone,JK Rowling,Returned
+7,Digital Minimalism,Cal Newport,Returned

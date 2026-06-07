@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LibraryCatalogue {
-    private BookNode root;
+    private BookNode root;  //declare root node of BST
     private static final String CATALOGUE_FILE = "book_catalogue.txt";  // sava available book
     private static final String ALL_BOOKS_FILE = "allBooks.txt"; //save all book data
 
@@ -19,22 +19,18 @@ public class LibraryCatalogue {
         loadCatalogueFromFile();
     }
 
-    /**
-     * STRICT UNIQUE VALIDATION: Checks the permanent global registry file.
-     * Returns true if the ISBN exists ANYWHERE in the library archive, 
-     * completely blocking duplicates even if the book is currently borrowed.
-     */
-    private boolean isBookCurrentlyAvailableInLibrary(long isbn) {
+    //method to prevent registering the exact same physical book twice
+    private boolean isbnDuplicated(long isbn) {
         File file = new File(ALL_BOOKS_FILE);
-        if (!file.exists()) return false;
+        if (!file.exists()) return false;   //check if file exist
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] tokens = line.split(",");
-                // STRIP THE BOOLEAN CHECK: If the ISBN matches, it exists in the library!
+                String[] tokens = line.split(","); // split line into tokens separated by ,
+                // check if the first token matches the new isbn
                 if (tokens.length >= 1 && Long.parseLong(tokens[0].trim()) == isbn) {
-                    return true; // Stop immediately; this ISBN is already registered
+                    return true; 
                 }
             }
         } catch (IOException | NumberFormatException e) {
@@ -43,13 +39,13 @@ public class LibraryCatalogue {
         return false;
     }
 
+    //method to add book
     public void addBook(long isbn, String title, String author) {
         // Validation Checks
         if (isbn <= 0) {
             System.out.println("Validation Failure: ISBN must be a positive number.");
             return;
         }
-        
         if (title == null || title.trim().isEmpty()) {
             System.out.println("Validation Failure: Title cannot be null or empty.");
             return;
@@ -59,13 +55,12 @@ public class LibraryCatalogue {
             return;
         }
 
-        // Validate against the permanent tracking file status
-        if (!isBookCurrentlyAvailableInLibrary(isbn)) {
+        // if isbn havent exist,add the book
+        if (!isbnDuplicated(isbn)) {
             Book newBook = new Book(isbn, title, author);
             root = insertRecursive(root, newBook);
             
-            // UNIFIED METHOD CALL: Writes to both storage files simultaneously upon addition
-            saveBookToFiles(newBook, false); 
+            saveBookToFiles(newBook, false);    // save book to both text file 
             
             System.out.println("Success: \"" + title + "\" added to both active and permanent catalogs.");
         } else {
@@ -73,11 +68,12 @@ public class LibraryCatalogue {
         }
     }
 
-    // Direct insertion method used for loading from file or re-inserting returns
+    // Inserts a new Book object into the tree.
     public void insertBookObject(Book book) {
         root = insertRecursive(root, book);
     }
 
+    // traverses BST to find correct spot for new book
     private BookNode insertRecursive(BookNode current, Book book) {
         if (current == null) {
             return new BookNode(book);
@@ -93,16 +89,14 @@ public class LibraryCatalogue {
         return current;
     }
 
-    /**
-     * PHYSICAL DELETION LOGIC: Removes a node entirely from the Binary Search Tree
-     * and synchronizes the change to both storage tracking files.
-     */
+    // remove book from BST when book is borrowed
     public void removeBook(long isbn) {
-        root = deleteRecursive(root, isbn);
-        updateActiveCatalogueFileState();             // Overwrites active file to remove the borrowed book from active catalogue
-        updatePermanentRegistryFileState(isbn, true); // Updates state line to true (Borrowed) in global file
+        root = deleteRecursive(root, isbn); //call deleteRecursive method 
+        updateActiveCatalogueFileState();   // Overwrites book_catalogue.txt to remove the borrowed book
+        updatePermanentRegistryFileState(isbn, true); // Updates book status to true (Borrowed) in allBooks.txt
     }
 
+    //BST deletion logic
     private BookNode deleteRecursive(BookNode current, long isbn) {
         if (current == null) return null;
 
@@ -111,17 +105,18 @@ public class LibraryCatalogue {
         } else if (isbn > current.book.getIsbn()) {
             current.right = deleteRecursive(current.right, isbn);
         } else {
-            // Node found: handle deletion cases
+            // deleting a node with zero or one child
             if (current.left == null) return current.right;
             if (current.right == null) return current.left;
 
-            // Node with two children: Get the inorder successor (smallest in the right subtree)
+            // deleting a node with two children
             current.book = findSmallest(current.right);
             current.right = deleteRecursive(current.right, current.book.getIsbn());
         }
         return current;
     }
 
+    //find smallest in BST
     private Book findSmallest(BookNode root) {
         Book smallest = root.book;
         while (root.left != null) {
@@ -131,19 +126,22 @@ public class LibraryCatalogue {
         return smallest;
     }
 
+    // find book in BST
     public Book findBook(long isbn) {
         return searchRecursive(root, isbn);
     }
 
+    // recursively searches the BST for a specific ISBN
     private Book searchRecursive(BookNode current, long isbn) {
-        if (current == null) return null;
-        if (isbn == current.book.getIsbn()) return current.book;
+        if (current == null) return null;   //reach dead end
+        if (isbn == current.book.getIsbn()) return current.book; //found exact match
 
-        return isbn < current.book.getIsbn() 
+        return isbn < current.book.getIsbn() //if target isbn < current isbn, go left, else go right
             ? searchRecursive(current.left, isbn) 
             : searchRecursive(current.right, isbn);
     }
 
+    //print all available book
     public void displayAllBooks() {
         if (root == null) {
             System.out.println("The library catalogue is currently empty.");
@@ -152,26 +150,23 @@ public class LibraryCatalogue {
         inOrderTraversal(root);
     }
 
+    // travels BST in-order and print in ascending order
     private void inOrderTraversal(BookNode node) {
         if (node != null) {
             inOrderTraversal(node.left);
-            System.out.println(node.book);      // Print the title alongside its availability status
+            System.out.println(node.book);    
             inOrderTraversal(node.right);
         }
     }
 
-    /**
-     * UNIFIED FILE SAVING METHOD: Handles writing to both tracking files simultaneously
-     */
+    // Appends a newly added book to both file
     private void saveBookToFiles(Book book, boolean isBorrowed) {
-        // 1. Write the clean 3-column format to the active catalogue file
         try (PrintWriter writer = new PrintWriter(new FileWriter(CATALOGUE_FILE, true))) {
             writer.println(book.getIsbn() + "," + book.getTitle() + "," + book.getAuthor());
         } catch (IOException e) {
             System.out.println("Warning: Unable to save to active catalogue file.");
         }
 
-        // 2. Write the 4-column status-tracked format to the permanent catalogue file
         try (PrintWriter writer = new PrintWriter(new FileWriter(ALL_BOOKS_FILE, true))) {
             writer.println(book.getIsbn() + "," + book.getTitle() + "," + book.getAuthor() + "," + isBorrowed);
         } catch (IOException e) {
@@ -179,17 +174,15 @@ public class LibraryCatalogue {
         }
     }
 
-    /**
-     * SYSTEM INITIALIZATION LOADER: Rebuilds the active available BST on boot using the clean 3-column records (active catalogue file)
-     */
+    //Loads saved books from book_catalogue.txt back into the tree
     private void loadCatalogueFromFile() {
         File file = new File(CATALOGUE_FILE);
-        if (!file.exists()) return;
+        if (!file.exists()) return;  //exit if no file to load
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] tokens = line.split(",");
+                String[] tokens = line.split(",");  // Break the line apart at ,
                 if (tokens.length == 3) {
                     long isbn = Long.parseLong(tokens[0]);
                     Book book = new Book(isbn, tokens[1], tokens[2]);
@@ -201,10 +194,7 @@ public class LibraryCatalogue {
         }
     }
 
-    /**
-     * ACTIVE TRACK DATABASE SYNCHRONIZER: Wipes and completely overwrites active catalogue file entries 
-     * using the current remaining in-memory live tree structure state
-     */
+    // Saves the current state of book tree back into book_catalogue.txt
     public void updateActiveCatalogueFileState() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(CATALOGUE_FILE))) {
             writeTreeToActiveFile(root, writer);
@@ -213,6 +203,7 @@ public class LibraryCatalogue {
         }
     }
 
+    // Recursively goes through the tree to write every book to the file in order
     private void writeTreeToActiveFile(BookNode node, PrintWriter writer) {
         if (node != null) {
             writeTreeToActiveFile(node.left, writer);
@@ -221,16 +212,14 @@ public class LibraryCatalogue {
         }
     }
 
-    /**
-     * PERMANENT TRACK DATABASE SYNCHRONIZER: Sifts through and flips state values only for lines 
-     * matching our current ISBN targets inside your permanent text registry database
-     */
+    
+    //Updates a specific book's status
     public void updatePermanentRegistryFileState(long targetIsbn, boolean statusToSet) {
         File file = new File(ALL_BOOKS_FILE);
         if (!file.exists()) return;
 
         List<String> memoryBuffer = new ArrayList<>();
-        boolean updated = false;
+        boolean updated = false;    // flag to ensure only update 1 copy
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -238,9 +227,9 @@ public class LibraryCatalogue {
                 String[] tokens = line.split(",");
                 if (tokens.length == 4 && Long.parseLong(tokens[0].trim()) == targetIsbn && !updated) {
                     memoryBuffer.add(tokens[0] + "," + tokens[1] + "," + tokens[2] + "," + statusToSet);
-                    updated = true; // Protect duplicate copy profiles by shifting only the targeted instance entry
+                    updated = true; 
                 } else {
-                    memoryBuffer.add(line);
+                    memoryBuffer.add(line); // if not the one just copy back
                 }
             }
         } catch (IOException e) {
@@ -248,6 +237,7 @@ public class LibraryCatalogue {
             return;
         }
 
+        // write the completely updated list back into the file
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             for (String line : memoryBuffer) {
                 writer.println(line);

@@ -1,4 +1,4 @@
 2,Murder at the Book Club,Betsy Reacley,Returned
 5,Throne of Glass,Sarah J. Mass,Returned
 1,The Lightkeeper,Jean Pendziwol,Returned
-4,Normal People,Sally Rooney,Borrowed
+4,Normal People,Sally Rooney,Returned

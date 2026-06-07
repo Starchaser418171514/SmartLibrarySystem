@@ -22,10 +22,10 @@ public class Main {
             System.out.println("7. Exit System");
             System.out.print("Select operational choice: ");
 
-            if (!sc.hasNextInt()) {
+            if (!sc.hasNextInt()) { //validation step if user input is not number
                 System.out.println("Input Error: Please pass an option number (1-7).");
                 sc.next();
-                continue;
+                continue;  //jump back to top of while loop
             }
 
             int choice = sc.nextInt();
@@ -34,7 +34,7 @@ public class Main {
 
             if (choice == 7) {
                 System.out.println("Exiting System Database. Goodbye.");
-                break;
+                break; //break out of while loop, meaning to stop the program
             }
 
             switch (choice) {
@@ -50,7 +50,7 @@ public class Main {
                     System.out.println("Access Granted. Proceeding with catalogue insertion...");
 
                     System.out.print("Enter Book ISBN (Numeric): ");
-                    if (!sc.hasNextLong()) {
+                    if (!sc.hasNextLong()) { // validate isbn enter is valid long number
                         System.out.println("Validation Failure: ISBN must be a number sequence.");
                         sc.nextLine();
                         break;
@@ -77,13 +77,13 @@ public class Main {
                     long targetIsbn = sc.nextLong();
                     sc.nextLine();
 
-                    // Step 1: High-speed O(log n) search through the active catalogue BST
+                    // High-speed O(log n) search through the active catalogue BST
                     Book matchingBook = library.findBook(targetIsbn);
                     
                     if (matchingBook != null) {
                         System.out.println("Query Match Found -> " + matchingBook + " [Status: Available on Shelf]");
                     } else {
-                        // Step 2: Fallback deep-scan validation in permanent registry if missing from the active catalogue
+                        // Validation in allBooks.txt if missing from the active catalogue
                         String registryStatus = library.checkPermanentRegistry(targetIsbn);
                         
                         if (registryStatus.equals("Borrowed")) {
@@ -114,7 +114,7 @@ public class Main {
                     library.borrowBook(idKey, borrowIsbn);
                     break;
 
-                case 4: // NEW OPTION HANDLER
+                case 4: 
                     System.out.print("Enter Student ID: ");
                     String returnId = sc.nextLine().trim();
                     if (returnId.isEmpty()) {

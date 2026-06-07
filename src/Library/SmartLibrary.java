@@ -7,36 +7,24 @@ public class SmartLibrary implements LibraryInterface {
     private BorrowStack borrowHistory;
 
     public SmartLibrary() {
-        this.catalogue = new LibraryCatalogue();
+        this.catalogue = new LibraryCatalogue();  
         this.borrowHistory = new BorrowStack();
     }
 
-    /**
-     * Function to add a book to the library's catalogue
-     * 
-     * @param isbn   The unique ISBN number of the book
-     * @param title  The title of the book
-     * @param author The author of the book
-     */
+    //add book 
     public void addBook(long isbn, String title, String author) {
         catalogue.addBook(isbn, title, author);
     }
 
-    /**
-     * Function to borrow a book from the library
-     * 
-     * @param isbn The unique ISBN number of the book to borrow
-     * @return true if the book was successfully borrowed, false otherwise
-     */
+    // check out a book, log the history, and remove it from the active library tree
     public boolean borrowBook(String studentId, long isbn) {
-        Book book = findBook(isbn);
+        Book book = findBook(isbn);  //check if book exist in nook_catalogue.txt
         
         if (book != null) {
-            // 1. Mark status and append to user text file stack
-            book.setIsBorrowed(true);
-            borrowHistory.addBorrowedBook(studentId, book);
+            book.setIsBorrowed(true); // updates book status to "borrowed"
+            borrowHistory.addBorrowedBook(studentId, book); // save this checkout to student's personal text file
             
-            // 2. Physically remove the book node from the tree
+            // remove the book node from the tree
             catalogue.removeBook(isbn);
             System.out.println("Success: Book has been physically checked out and removed from the active catalogue.");
             return true;
@@ -46,20 +34,20 @@ public class SmartLibrary implements LibraryInterface {
         return false;
     }
 
-    // Upgraded Admin Logic: Recovers book data from borrower's history file and re-inserts it back into the BST catalogue
+    // processes book return, update the student's record and put the book back in the library
     public boolean returnBook(String studentId, long isbn) {        
-        // Find the book data inside the student's file history since it doesn't exist in the tree anymore
+        // find the book data from student's file history
         Book bookContext = borrowHistory.findBookInHistory(studentId, isbn);
         
         if (bookContext != null) {
-            // Revert availability flag state
+            // mark the book as available
             bookContext.setIsBorrowed(false);
         
-            // 1. Physically insert the book node back into the Binary Search Tree
+            //insert the book node back into the Binary Search Tree
             catalogue.insertBookObject(bookContext);
-            catalogue.updateActiveCatalogueFileState(); // Sync up main text database file
+            catalogue.updateActiveCatalogueFileState(); // save the updated tree back to book_catalogue.txt
 
-            // 2. Mark the row status as "Returned" inside the student's personal history file
+            // mark book status as "Returned" in student's personal history file
             borrowHistory.returnBookInFile(studentId, isbn);
 
             System.out.println("Success: \"" + bookContext.getTitle() + "\" has been returned and re-inserted into the active catalogue!");
@@ -70,33 +58,22 @@ public class SmartLibrary implements LibraryInterface {
         }
     }
 
-    /**
-     * Function to view the latest borrowing history
-     */
+    //view the latest borrowing history
     public void viewLatestHistory(String studentId) {
         borrowHistory.showHistory(studentId);
     }
 
-    /**
-     * Function to find a book in the library's catalogue
-     * 
-     * @param isbn The unique ISBN number of the book to find
-     * @return The Book object if found, null otherwise
-     */
+    //find a book in book_catalogue.txt
     public Book findBook(long isbn) {
         return catalogue.findBook(isbn);
     }
 
-    // Expose catalog printing to system view loops
+    // print the currently available books (in book_catalogue.txt)
     public void displayAllCatalogBooks() {
         catalogue.displayAllBooks();
     }
 
-    /**
-     * NEW SEARCH HELPER: Scans the permanent global file to determine 
-     * if a missing BST book is borrowed or completely non-existent.
-     * Returns "Borrowed" if owned but out on loan, or "Not Owned" if missing completely.
-     */
+    // Scans allBooks.txt to check if a specific book is currently checked out
     public String checkPermanentRegistry(long isbn) {
         java.io.File file = new java.io.File("allBooks.txt");
         if (!file.exists()) return "Not Owned";
@@ -118,6 +95,3 @@ public class SmartLibrary implements LibraryInterface {
         return "Not Owned";
     }
 }
-
-
-
